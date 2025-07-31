@@ -4,8 +4,8 @@ import mongoose from "mongoose";
 import cors from "cors";
 import fs from "fs";
 import https from "https";
-import computerRoutes from './routes/computerRoutes.js'
-import { startPingLoop } from './services/pingService.js'
+import computerRoutes from "./routes/computerRoutes.js";
+import { startPingLoop } from "./services/pingService.js";
 
 dotenv.config();
 
@@ -29,7 +29,7 @@ const sslOptions = {
 app.use(cors());
 app.use(express.json());
 
-app.use('/api/computer', computerRoutes)
+app.use("/api/computer", computerRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -40,4 +40,4 @@ https.createServer(sslOptions, app).listen(port, host, () => {
   console.log(`🚀 Express HTTPS server running at https://${host}:${port}`);
 });
 
-startPingLoop(30)
+startPingLoop(30);

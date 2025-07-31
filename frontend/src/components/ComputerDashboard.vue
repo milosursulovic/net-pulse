@@ -72,7 +72,6 @@ const confirmDelete = async (id) => {
   }
 }
 
-// ⏱ Prikaz koliko dugo je status nepromenjen
 const formatStatusDuration = (computer) => {
   if (!computer.lastStatusChange) return ''
   const since = new Date(computer.lastStatusChange)
@@ -84,14 +83,12 @@ const formatStatusDuration = (computer) => {
   return `${label} ${minutes}m ${seconds}s`
 }
 
-// 🕒 Formatiranje datuma
 const formatDate = (date) => {
   if (!date) return ''
   const d = new Date(date)
   return d.toLocaleString()
 }
 
-// 🔁 Auto-refresh svakih 10s
 let intervalId
 onMounted(() => {
   loadComputers()

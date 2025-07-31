@@ -1,28 +1,23 @@
-import { fileURLToPath, URL } from 'node:url'
+import { fileURLToPath, URL } from "node:url";
 
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import vueDevTools from 'vite-plugin-vue-devtools'
-import tailwindcss from '@tailwindcss/vite'
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
+import vueDevTools from "vite-plugin-vue-devtools";
+import tailwindcss from "@tailwindcss/vite";
 
-import fs from 'fs'
-import dotenv from 'dotenv'
+import fs from "fs";
+import dotenv from "dotenv";
 
-dotenv.config()
+dotenv.config();
 
-const ip = process.env.VITE_HOST_IP_ADDRESS
-const port = process.env.VITE_HOST_PORT
+const ip = process.env.VITE_HOST_IP_ADDRESS;
+const port = process.env.VITE_HOST_PORT;
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    vue(),
-    vueDevTools(),
-    tailwindcss()
-  ],
+  plugins: [vue(), vueDevTools(), tailwindcss()],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
   server: {
@@ -33,4 +28,4 @@ export default defineConfig({
     host: ip,
     port: port,
   },
-})
+});

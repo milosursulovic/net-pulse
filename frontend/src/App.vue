@@ -1,5 +1,5 @@
 <script setup>
-  import ComputerDashboard from './components/ComputerDashboard.vue'
+import ComputerDashboard from './components/ComputerDashboard.vue'
 </script>
 
 <template>
