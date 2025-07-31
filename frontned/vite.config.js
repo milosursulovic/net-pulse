@@ -5,6 +5,14 @@ import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import tailwindcss from '@tailwindcss/vite'
 
+import fs from 'fs'
+import dotenv from 'dotenv'
+
+dotenv.config()
+
+const ip = process.env.VITE_HOST_IP_ADDRESS
+const port = process.env.VITE_HOST_PORT
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -16,5 +24,13 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
+  },
+  server: {
+    https: {
+      key: fs.readFileSync(process.env.VITE_SSL_KEY_PATH),
+      cert: fs.readFileSync(process.env.VITE_SSL_CERT_PATH),
+    },
+    host: ip,
+    port: port,
   },
 })
