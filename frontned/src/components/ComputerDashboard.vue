@@ -63,7 +63,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 
 const computers = ref([])
 const newComputer = ref({ name: '', ipAddress: '' })
-const apiBase = 'https://10.230.62.70:3001/api/computer'
+const apiBase = `${import.meta.env.VITE_API_URL}/api/computer`
 
 const loadComputers = async () => {
   const res = await fetch(apiBase)
