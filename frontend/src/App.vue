@@ -1,9 +1,9 @@
 <script setup>
-import ComputerDashboard from './components/ComputerDashboard.vue'
+import { RouterView } from "vue-router";
 </script>
 
 <template>
-  <ComputerDashboard />
+  <RouterView />
 </template>
 
 <style scoped></style>
