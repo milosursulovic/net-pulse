@@ -6,6 +6,8 @@ import fs from "fs";
 import https from "https";
 import computerRoutes from "./routes/computerRoutes.js";
 import { startPingLoop } from "./services/pingService.js";
+import authRoutes from "./routes/authRoutes.js";
+import { requireAuth } from "./middlewares/auth.js";
 
 dotenv.config();
 
@@ -29,7 +31,8 @@ const sslOptions = {
 app.use(cors());
 app.use(express.json());
 
-app.use("/api/computer", computerRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/computer", requireAuth, computerRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI)

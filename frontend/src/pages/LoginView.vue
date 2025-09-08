@@ -11,7 +11,7 @@
           class="h-16 w-16 rounded-2xl border shadow bg-white p-2 object-contain"
         />
         <h1 class="mt-3 text-2xl font-bold text-slate-800">{{ appName }}</h1>
-        <p class="text-xs text-slate-500">verzija {{ version }}</p>
+        <p class="text-xs text-slate-500">verzija {{ appVersion }}</p>
       </div>
 
       <!-- Card -->
@@ -101,7 +101,7 @@
 
       <!-- Footer -->
       <div class="mt-4 text-center text-xs text-slate-500">
-        © {{ new Date().getFullYear() }} {{ appName }} · Build {{ version }}
+        © {{ new Date().getFullYear() }} {{ appName }} · Build {{ appVersion }}
       </div>
     </div>
   </div>
@@ -110,14 +110,8 @@
 <script setup>
 import { ref } from "vue";
 
-/**
- * Props (možeš i hardkodovati ako želiš)
- */
-const props = defineProps({
-  appName: { type: String, default: "NetPulse" },
-  version: { type: String, default: "v1.0.0" },
-  redirectTo: { type: String, default: "/" }, // gde posle uspešnog logina
-});
+const appName = "NetPulse";
+const appVersion = import.meta.env.VITE_APP_VERSION || "v1.0.0";
 
 const username = ref("");
 const password = ref("");
@@ -145,22 +139,15 @@ const onSubmit = async () => {
       const t = await res.text().catch(() => "");
       throw new Error(t || "Neispravni kredencijali ili greška na serveru.");
     }
-    const data = await res.json(); // očekuje { token, user? }
+    const data = await res.json();
     const token = data.token || data.accessToken;
     if (!token) throw new Error("Server nije vratio token.");
 
-    // Sačuvaj token (localStorage ili sessionStorage)
     const store = remember.value ? localStorage : sessionStorage;
     store.setItem("authToken", token);
     if (data.user) store.setItem("authUser", JSON.stringify(data.user));
 
-    // Redirect ili emit
-    if (props.redirectTo) {
-      window.location.assign(props.redirectTo);
-    } else {
-      // Ako koristiš parent handler:
-      // emit('login-success', { token, user: data.user })
-    }
+    window.location.assign("/");
   } catch (e) {
     console.error(e);
     error.value = e.message || "Prijava nije uspela.";
@@ -169,8 +156,3 @@ const onSubmit = async () => {
   }
 };
 </script>
-
-<style scoped>
-/* po želji, minimalno: */
-/* .glass { backdrop-filter: blur(8px); } */
-</style>
