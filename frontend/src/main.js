@@ -6,6 +6,12 @@ import router from "./router";
 
 const app = createApp(App);
 
+router.beforeEach((to, from, next) => {
+  const defaultTitle = "NetPulse";
+  document.title = to.meta.title || defaultTitle;
+  next();
+});
+
 app.use(router);
 
 app.mount("#app");
