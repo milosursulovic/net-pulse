@@ -2,6 +2,22 @@
   <div class="w-full px-4 sm:px-6 py-6">
     <h1 class="text-3xl font-bold text-blue-700 mb-6">🖥 NetPulse – Računari</h1>
 
+    <!-- KPI kartice -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+      <div class="p-4 rounded-xl border bg-white">
+        <p class="text-sm text-gray-500">Ukupno</p>
+        <p class="text-2xl font-semibold text-slate-800">{{ totalCount }}</p>
+      </div>
+      <div class="p-4 rounded-xl border bg-white">
+        <p class="text-sm text-gray-500">Online</p>
+        <p class="text-2xl font-semibold text-emerald-700">{{ onlineCount }}</p>
+      </div>
+      <div class="p-4 rounded-xl border bg-white">
+        <p class="text-sm text-gray-500">Offline</p>
+        <p class="text-2xl font-semibold text-rose-700">{{ offlineCount }}</p>
+      </div>
+    </div>
+
     <!-- Dodavanje pojedinačnog računara -->
     <form @submit.prevent="addComputer" class="flex flex-col md:flex-row gap-4 mb-6">
       <input v-model="newComputer.name" placeholder="Naziv" required
@@ -78,20 +94,41 @@
       </p>
     </div>
 
-    <!-- Status -->
-    <div class="flex items-center gap-3 mb-4">
-      <button @click="loadComputers"
-        class="px-3 py-1.5 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 disabled:opacity-60" :disabled="busy"
-        title="Osveži listu odmah">
-        🔄 Osveži
-      </button>
-      <span class="text-sm text-gray-500" v-if="busy">Učitavam…</span>
-      <span class="text-sm text-gray-500" v-else>Automatsko osvežavanje na 10s</span>
+    <!-- Status + Filter -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+      <div class="flex items-center gap-3">
+        <button @click="loadComputers"
+          class="px-3 py-1.5 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 disabled:opacity-60"
+          :disabled="busy" title="Osveži listu odmah">
+          🔄 Osveži
+        </button>
+        <span class="text-sm text-gray-500" v-if="busy">Učitavam…</span>
+        <span class="text-sm text-gray-500" v-else>Automatsko osvežavanje na 10s</span>
+      </div>
+
+      <!-- Filter dugmad -->
+      <div class="inline-flex rounded-lg border bg-white overflow-hidden">
+        <button class="px-3 py-1.5 text-sm"
+          :class="filter === 'all' ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-50'"
+          @click="setFilter('all')" title="Prikaži sve">
+          Svi ({{ totalCount }})
+        </button>
+        <button class="px-3 py-1.5 text-sm border-l"
+          :class="filter === 'online' ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-50'"
+          @click="setFilter('online')" title="Samo online">
+          Online ({{ onlineCount }})
+        </button>
+        <button class="px-3 py-1.5 text-sm border-l"
+          :class="filter === 'offline' ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-50'"
+          @click="setFilter('offline')" title="Samo offline">
+          Offline ({{ offlineCount }})
+        </button>
+      </div>
     </div>
 
     <!-- Lista računara -->
     <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-      <div v-for="computer in computers" :key="computer._id || computer.id"
+      <div v-for="computer in filteredComputers" :key="computer._id || computer.id"
         class="p-4 border rounded-xl shadow-sm bg-white flex flex-col justify-between">
         <div>
           <p class="font-semibold text-lg">{{ computer.name }}</p>
@@ -114,11 +151,16 @@
         </div>
       </div>
     </div>
+
+    <!-- Prazan state -->
+    <div v-if="!filteredComputers.length && !busy" class="text-center text-sm text-gray-500 mt-6">
+      Nema rezultata za odabrani filter.
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import * as XLSX from 'xlsx'
 
 const computers = ref([])
@@ -129,8 +171,24 @@ const busy = ref(false)
 const isDragging = ref(false)
 const fileInputRef = ref(null)
 
+const filter = ref('all') // 'all' | 'online' | 'offline'
+
 const apiBase = `${import.meta.env.VITE_API_URL}/api/computer`
 
+/* ====== Derived metrics & filtering ====== */
+const totalCount = computed(() => computers.value.length)
+const onlineCount = computed(() => computers.value.filter(c => !!c.isOnline).length)
+const offlineCount = computed(() => computers.value.filter(c => !c.isOnline).length)
+
+const filteredComputers = computed(() => {
+  if (filter.value === 'online') return computers.value.filter(c => !!c.isOnline)
+  if (filter.value === 'offline') return computers.value.filter(c => !c.isOnline)
+  return computers.value
+})
+
+const setFilter = (f) => { filter.value = f }
+
+/* ====== API ====== */
 const loadComputers = async () => {
   try {
     busy.value = true
