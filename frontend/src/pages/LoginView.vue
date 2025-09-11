@@ -3,7 +3,6 @@
     class="min-h-screen grid place-items-center bg-gradient-to-br from-slate-50 to-slate-100 px-4"
   >
     <div class="w-full max-w-md">
-      <!-- Header / Logo -->
       <div class="flex flex-col items-center mb-6">
         <img
           src="@/assets/logo.png"
@@ -14,14 +13,12 @@
         <p class="text-xs text-slate-500">verzija {{ appVersion }}</p>
       </div>
 
-      <!-- Card -->
       <div class="rounded-2xl border bg-white shadow-sm p-6">
         <p class="text-sm text-slate-600 mb-4">
           Prijavi se da nastaviš u <span class="font-medium">{{ appName }}</span
           >.
         </p>
 
-        <!-- Error -->
         <div
           v-if="error"
           class="mb-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700"
@@ -30,7 +27,6 @@
         </div>
 
         <form @submit.prevent="onSubmit" class="grid gap-3">
-          <!-- Username -->
           <label class="grid gap-1">
             <span class="text-xs font-medium text-slate-600"
               >Korisničko ime</span
@@ -45,7 +41,6 @@
             />
           </label>
 
-          <!-- Password -->
           <label class="grid gap-1">
             <span class="text-xs font-medium text-slate-600">Lozinka</span>
             <div class="relative">
@@ -68,7 +63,6 @@
             </div>
           </label>
 
-          <!-- Submit -->
           <button
             type="submit"
             :disabled="busy || !username || !password"
@@ -99,7 +93,6 @@
         </form>
       </div>
 
-      <!-- Footer -->
       <div class="mt-4 text-center text-xs text-slate-500">
         © {{ new Date().getFullYear() }} {{ appName }} · Build {{ appVersion }}
       </div>
