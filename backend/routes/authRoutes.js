@@ -5,11 +5,6 @@ import User from "../models/User.js";
 
 const router = express.Router();
 
-/**
- * POST /api/auth/login
- * body: { username, password }
- * returns: { token, user }
- */
 router.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body || {};
@@ -21,7 +16,6 @@ router.post("/login", async (req, res) => {
     if (!user)
       return res.status(401).json({ error: "Neispravni kredencijali." });
 
-    // password check
     const ok = await bcrypt.compare(password, user.passwordHash);
     if (!ok) return res.status(401).json({ error: "Neispravni kredencijali." });
 
@@ -31,7 +25,6 @@ router.post("/login", async (req, res) => {
       { expiresIn: process.env.JWT_EXPIRES || "7d" }
     );
 
-    // vrati bez passwordHash
     const { passwordHash, ...safeUser } = user;
     res.json({ token, user: safeUser });
   } catch (e) {

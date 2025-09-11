@@ -7,7 +7,6 @@ export function requireAuth(req, res, next) {
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-    // payload: { sub, username, role, iat, exp }
     req.user = payload;
     return next();
   } catch (err) {

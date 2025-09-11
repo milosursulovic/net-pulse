@@ -7,7 +7,10 @@ import https from "https";
 import computerRoutes from "./routes/computerRoutes.js";
 import { startPingLoop } from "./services/pingService.js";
 import authRoutes from "./routes/authRoutes.js";
+import analyticsRoutes from "./routes/analyticsRoutes.js";
 import { requireAuth } from "./middlewares/auth.js";
+import { rollupDay } from "./jobs/rollupDaily.js";
+import cron from "node-cron";
 
 dotenv.config();
 
@@ -33,6 +36,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/computer", requireAuth, computerRoutes);
+app.use("/api/analytics", requireAuth, analyticsRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -44,3 +48,22 @@ https.createServer(sslOptions, app).listen(port, host, () => {
 });
 
 startPingLoop(30);
+
+// zakazani nightly rolap — svaki dan u 00:05 UTC
+cron.schedule(
+  "5 0 * * *",
+  async () => {
+    try {
+      const today = new Date();
+      const ymd = new Date(today.getTime() - 24 * 3600 * 1000) // juče
+        .toISOString()
+        .slice(0, 10);
+      console.log(`📊 Pokrećem rolap za dan ${ymd}...`);
+      await rollupDay(ymd);
+      console.log(`✅ Rolap ${ymd} završen`);
+    } catch (err) {
+      console.error("❌ Greška u rolapu:", err);
+    }
+  },
+  { timezone: "UTC" }
+); // da se ne pomeri sa lokalnim TZ
